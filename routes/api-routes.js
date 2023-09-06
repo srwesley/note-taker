@@ -1,43 +1,38 @@
-const path = require("path");
+// Dependencies
 const router = require("express").Router();
 const fs = require("fs");
 
-const {v4: uuidv4 } = require("uuid");
-
 router.get("/notes", (req, res) => {
-    console.log("\n GET note request");
-    let data = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
-    res.json(data);
+    fs.readFile("./db/db.json", "utf8", (err, data) => {
+        const notes = JSON.parse(data);
+        res.json(notes);
+    });
 });
 
 router.post("/notes", (req, res) => {
-    console.log("--- POST");
+    fs.readFile("./db/db.json", "utf8", (err, data) => {
+        const notes = JSON.parse(data);
+        const note = req.body;
+        const id = (notes.length).toString();
+        note.id = id;
+        notes.push(note);
 
-    let newNote = {
-        title: req.body.title,
-        text: req.body.text,
-        id: uuidv4(),
-    };
-    console.log("\n Successfully added new note!");
+        fs.writeFileSync("./db/db.json", JSON.stringify(notes));
 
-    res.json(newNote);
+        res.json(notes);
+    });
 });
 
-router.delete("/notes", (req, res) => {
-    console.log("-- Delete");
-    
-    let deleteNoteId = req.params.id.toString();
-    console.log(`\n Delete note with id: ${deleteNoteId}`);
+router.delete("/notes/:id", (req, res) => {
+    fs.readFile("./db/db.json", "utf8", (err, data) => {
+        const notes = JSON.parse(data);
+        const id = req.params.id;
+        const deleted = notes.filter((target) => target.id != id);
 
-    let data = JSON.parse(fs.writeFileSync("./db/db.json", "utf8"));
+        fs.writeFileSync("./db/db.json", JSON.stringify(deleted));
 
-    const newData = data.filter(note => note.id.toString() !== deleteNoteId);
-
-    fs.writeFileSync("./db/db.json", JSON.stringify(newData));
-
-    console.log(`\n Successfully deleted new note! : ${deleteNoteId}`);
-
-    res.json(newData);
+        res.json(notes);
+    });
 });
 
 module.exports = router;
