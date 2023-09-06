@@ -2,6 +2,7 @@
 const router = require("express").Router();
 const fs = require("fs");
 
+// Reads the database file and returns the saved notes as a json
 router.get("/notes", (req, res) => {
     fs.readFile("./db/db.json", "utf8", (err, data) => {
         const notes = JSON.parse(data);
@@ -9,6 +10,7 @@ router.get("/notes", (req, res) => {
     });
 });
 
+// Post request receives new note to save to the request body, adds it to the db.json file, and returns the new note to the client
 router.post("/notes", (req, res) => {
     fs.readFile("./db/db.json", "utf8", (err, data) => {
         const notes = JSON.parse(data);
@@ -23,6 +25,7 @@ router.post("/notes", (req, res) => {
     });
 });
 
+// Deletes a selected note based on id
 router.delete("/notes/:id", (req, res) => {
     fs.readFile("./db/db.json", "utf8", (err, data) => {
         const notes = JSON.parse(data);
@@ -35,4 +38,5 @@ router.delete("/notes/:id", (req, res) => {
     });
 });
 
+// This line exports the router instance to be used by other parts of the app
 module.exports = router;
